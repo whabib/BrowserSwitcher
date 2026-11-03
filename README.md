@@ -45,7 +45,7 @@ The menu has a **Start at Login** toggle just above **Quit**. Turn it on and the
 
 ## Notes
 
-- macOS shows its own "Change default browser?" confirmation when you switch. This is a system security prompt and can't be bypassed. You may see it once for `http` and once for `https`.
+- macOS shows its own "Change default browser?" confirmation when you switch. This is a system security prompt and can't be bypassed. It appears once per switch: the app sets `http`, and macOS applies the change to `https` as well.
 - The list contains apps registered to open both `http` and `https` URLs. An occasional non-browser app may appear if it registers for both.
 - The app is unsigned. If Gatekeeper blocks the first launch, right-click the app and choose **Open**, or run `xattr -dr com.apple.quarantine BrowserSwitcher.app`. Apps you build locally normally aren't quarantined.
 

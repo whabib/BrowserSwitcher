@@ -13,8 +13,9 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleIdentifier</key><string>local.browserswitcher</string>
   <key>CFBundleExecutable</key><string>BrowserSwitcher</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>LSMinimumSystemVersion</key><string>12.0</string>
+  <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>LSUIElement</key><true/>
 </dict></plist>
 PLIST
+codesign --force --sign - "$APP"
 echo "Built $APP — run with: open $APP"

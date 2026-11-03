@@ -1,4 +1,5 @@
 import AppKit
+import ServiceManagement
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
@@ -25,14 +26,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let item = NSMenuItem(title: shortName(for: url), action: #selector(selectBrowser(_:)), keyEquivalent: "")
             item.target = self
             item.representedObject = url
-            let icon = NSWorkspace.shared.icon(forFile: url.path)
-            icon.size = NSSize(width: 16, height: 16)
-            item.image = icon
+            item.image = menuIcon(for: url)
             item.state = (url.standardizedFileURL == current?.standardizedFileURL) ? .on : .off
             menu.addItem(item)
         }
         menu.addItem(.separator())
+
+        let login = NSMenuItem(title: "Start at Login", action: #selector(toggleLogin(_:)), keyEquivalent: "")
+        login.target = self
+        login.state = (SMAppService.mainApp.status == .enabled) ? .on : .off
+        menu.addItem(login)
+
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+    }
+
+    /// Renders the app icon into a fresh 16x16 image so the menu always gets a correctly sized bitmap.
+    private func menuIcon(for url: URL) -> NSImage {
+        let source = NSWorkspace.shared.icon(forFile: url.path)
+        let size = NSSize(width: 16, height: 16)
+        let image = NSImage(size: size, flipped: false) { rect in
+            source.draw(in: rect, from: .zero, operation: .sourceOver, fraction: 1.0)
+            return true
+        }
+        image.isTemplate = false
+        return image
     }
 
     /// Apps that can open both http and https URLs (filters out most non-browsers).
@@ -47,6 +64,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func shortName(for url: URL) -> String {
         let name = FileManager.default.displayName(atPath: url.path)
         return name.hasSuffix(".app") ? String(name.dropLast(4)) : name
+    }
+
+    @objc private func toggleLogin(_ sender: NSMenuItem) {
+        let service = SMAppService.mainApp
+        do {
+            if service.status == .enabled {
+                try service.unregister()
+            } else {
+                try service.register()
+            }
+        } catch {
+            NSLog("Login item change failed: \(error)")
+            let alert = NSAlert()
+            alert.messageText = "Couldn't change the login item"
+            alert.informativeText = error.localizedDescription
+            alert.runModal()
+        }
+        if service.status == .requiresApproval {
+            SMAppService.openSystemSettingsLoginItems()
+        }
     }
 
     @objc private func selectBrowser(_ sender: NSMenuItem) {

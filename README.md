@@ -2,11 +2,11 @@
 
 A tiny macOS menu bar app for switching your default web browser without opening System Settings.
 
-Click the globe icon in the menu bar to see every browser installed on your Mac, each with its icon and short name. The current default has a checkmark. Pick another one to make it the default for `http` and `https`.
+Click the globe icon in the menu bar to see every browser installed on your Mac, each with its icon and short name. The current default has a checkmark. Pick another one to make it the default for `http` and `https`. A **Start at Login** toggle adds or removes the app from your Login Items for you.
 
 ## Requirements
 
-- macOS 12 (Monterey) or later
+- macOS 13 (Ventura) or later
 - Xcode command line tools (provides `swiftc`):
 
   ```bash
@@ -33,7 +33,7 @@ open BrowserSwitcher.app
 
 The app lives only in the menu bar (no Dock icon). Use **Quit** in its menu to exit.
 
-To keep it available, drag `BrowserSwitcher.app` to `/Applications`. To start it at login, add it under System Settings → General → Login Items.
+For best results, drag `BrowserSwitcher.app` to `/Applications` before enabling **Start at Login**, since the login item points at the app's current location.
 
 ## Notes
 

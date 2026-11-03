@@ -26,7 +26,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let item = NSMenuItem(title: shortName(for: url), action: #selector(selectBrowser(_:)), keyEquivalent: "")
             item.target = self
             item.representedObject = url
-            item.image = menuIcon(for: url)
+            // Embed the icon in the title itself rather than using NSMenuItem.image,
+            // which some macOS versions don't draw for status item menus.
+            let attachment = NSTextAttachment()
+            attachment.image = menuIcon(for: url)
+            attachment.bounds = CGRect(x: 0, y: -3, width: 16, height: 16)
+            let title = NSMutableAttributedString(attachment: attachment)
+            title.append(NSAttributedString(string: "  " + shortName(for: url)))
+            title.addAttribute(.font, value: NSFont.menuFont(ofSize: 0), range: NSRange(location: 0, length: title.length))
+            item.attributedTitle = title
             item.state = (url.standardizedFileURL == current?.standardizedFileURL) ? .on : .off
             menu.addItem(item)
         }

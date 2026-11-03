@@ -96,11 +96,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func selectBrowser(_ sender: NSMenuItem) {
         guard let appURL = sender.representedObject as? URL else { return }
-        // macOS shows its own "Change default browser?" confirmation; that can't be bypassed.
-        for scheme in ["http", "https"] {
-            NSWorkspace.shared.setDefaultApplication(at: appURL, toOpenURLsWithScheme: scheme) { error in
-                if let error = error { NSLog("Failed to set \(scheme) handler: \(error)") }
+        // Set http first and wait for it. macOS may switch https along with it; only
+        // if https is still on the old browser do we set it too (a second system prompt).
+        NSWorkspace.shared.setDefaultApplication(at: appURL, toOpenURLsWithScheme: "http") { [weak self] error in
+            if let error = error {
+                NSLog("Failed to set http handler: \(error)")
+                return  // cancelled or failed: don't ask a second time
             }
+            DispatchQueue.main.async { self?.setHTTPSIfNeeded(appURL) }
+        }
+    }
+
+    private func setHTTPSIfNeeded(_ appURL: URL) {
+        let current = NSWorkspace.shared.urlForApplication(toOpen: probeURL)
+        guard current?.standardizedFileURL != appURL.standardizedFileURL else { return }
+        NSWorkspace.shared.setDefaultApplication(at: appURL, toOpenURLsWithScheme: "https") { error in
+            if let error = error { NSLog("Failed to set https handler: \(error)") }
         }
     }
 }

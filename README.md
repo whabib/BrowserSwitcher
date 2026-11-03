@@ -35,6 +35,14 @@ The app lives only in the menu bar (no Dock icon). Use **Quit** in its menu to e
 
 For best results, drag `BrowserSwitcher.app` to `/Applications` before enabling **Start at Login**, since the login item points at the app's current location.
 
+## Start at Login
+
+The menu has a **Start at Login** toggle just above **Quit**. Turn it on and the app adds itself to System Settings → General → Login Items, so it launches automatically when you log in. Turn it off to remove it. The checkmark always reflects the current state, even if you change it manually in System Settings.
+
+- Move `BrowserSwitcher.app` to `/Applications` first. The login item points to the app's location when you enable it, so moving the app later breaks it (toggle off and on again to fix).
+- If macOS asks for approval, the app opens the Login Items settings pane; enable BrowserSwitcher there.
+- If registration fails, an alert shows the error.
+
 ## Notes
 
 - macOS shows its own "Change default browser?" confirmation when you switch. This is a system security prompt and can't be bypassed. You may see it once for `http` and once for `https`.
